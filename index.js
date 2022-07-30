@@ -7,6 +7,11 @@ function incluir(){
   des=document.querySelector('#des').value;
   value=document.querySelector('#value').value;
 
+  // a validação tem pontos cegos. Por exemplo:
+  // - preço não-numérico
+  // - preço menor ou igual a zero
+  // - descrição vazia
+  // - nome que consiste somente de espaços, como "   "
   try {
     if(nome == "") throw `Falha no cadastro do produto!`;
   }
@@ -78,10 +83,22 @@ function info(dado){
   return data.innerHTML = div;
 }
 
+// o parâmetro "dado" é inicialmente o "id" do produto
 function edit(dado){
   i=0;
   while (i < produtos.length) {
   if(produtos[i]['id']==dado){
+    // aqui você troca o parâmetro "dado" para o índice do produto (i).
+    // Isso é uma má prática, porque deixa bem confuso qual é o papel do "dado".
+    // Ou seja, quem vai ler o código tem uma primeira impressão sobre o papel dele
+    // e depois descobre que na verdade o papel do "dado" muda durante a execução do código.
+    // Pensando no princípio de que um bom código é aquele que é simples de ler e entender,
+    // trocar o propósito do "dado" adiciona complexidade desnecessariamente.
+    // Alternativa: renomear o parâmetro dado para "produtoID" e criar uma outra variável local
+    // "const produtoIndice = i;"
+    // Assim quem está lendo sabe de imediato pra quê cada uma serve (o próprio nome das variáveis
+    // já diz).
+    // Aliás, esse "dado" gera um bug na função save_edit, veja lá
     dado=i;
   }
   i++;
@@ -108,6 +125,12 @@ function save_edit(dado){
   nome=document.querySelector('#name_save').value;
   des=document.querySelector('#des_save').value;
   value=document.querySelector('#value_save').value;
+  // trocar o id pra "dado" é fonte de bug, porque o "dado" aqui é o ÍNDICE do produto, não seu ID original. 
+  // Pra perceber isso faça o seguinte:
+  //  - Crie 4 produtos
+  //  - Apague o segundo (id=1)
+  //  - Edite o último (id=3)
+  //  - Verá que o último produto vai mudar pra id 2 !! Aí ficarão 2 produtos com id=2: o último e o penúltimo !
   produtos[dado]={'id':dado,
     'name':nome,
     'description':des,
